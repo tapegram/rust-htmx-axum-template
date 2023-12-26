@@ -6,14 +6,11 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-auth-service = { path = "../auth/auth-service" }
 axum = { workspace = true }
 axum-flash = { workspace = true }
 axum-login = { workspace = true }
 chrono = { workspace = true }
 dotenvy = { workspace = true }
-mongo-worksite-repository = { path = "../worksite/adapters/mongo-worksite-repository" }
-mongo-user-repository = { path = "../auth/adapters/mongo-user-repository" }
 rand = { workspace = true, features = ["min_const_gen"] }
 serde = { workspace = true }
 serde_json = { workspace = true }
@@ -25,4 +22,3 @@ tower-sessions = { workspace = true, features = ["mongodb-store"] }
 tracing = { workspace = true }
 tracing-subscriber = { workspace = true }
 web-htmx = { path = "../web-htmx" }
-worksite-service = { path = "../worksite/worksite-service" }

@@ -6,4 +6,3 @@ pub mod not_found_message;
 pub mod page;
 pub mod page_content;
 pub mod simple_form;
-pub mod worker_profile_fieldset;

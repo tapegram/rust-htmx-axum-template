@@ -1,6 +1,3 @@
-use auth_service::{
-    create_user::CreateUserInput, get_user_for_login::GetUserForLoginInput, service::AuthService,
-};
 use axum::{
     error_handling::HandleErrorLayer, http::StatusCode, response::IntoResponse, routing::get,
     BoxError, Router,
@@ -8,20 +5,11 @@ use axum::{
 use axum_login::{tower_sessions::SessionManagerLayer, AuthManagerLayerBuilder};
 use chrono::prelude::*;
 use environment::load_environment;
-use mongo_user_repository::{MongoUserRepository, MongoUserStore};
-use mongo_worksite_repository::MongoWorksiteRepository;
 use std::{net::SocketAddr, sync::Arc};
 use tower::ServiceBuilder;
 
 use tower_sessions::{cookie::time::Duration, mongodb::Client, Expiry, MongoDBStore};
 use web_htmx::{livereload, routes as web_routes, state::WebHtmxState};
-use worksite_service::{
-    models::{
-        Address, Assessment, AssignedTag, Location, Shift, ShiftWorker, Tag, Worker, Worksite,
-    },
-    ports::worksite_repository::WorksiteRepository,
-    service::WorksiteService,
-};
 
 mod environment;
 

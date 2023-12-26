@@ -6,10 +6,7 @@ use axum::{
     response::Response,
 };
 use axum_login::{tower_sessions::Session, AuthSession};
-use mongo_user_repository::MongoUserStore;
 use std::{collections::HashMap, future::Future};
-
-use auth_service::models::{User, UserPermission, UserRole};
 
 use crate::state::WebHtmxState;
 

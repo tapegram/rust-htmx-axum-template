@@ -1,5 +1,3 @@
-use auth_service::models::UserPermission;
-
 use rscx::{component, html, props, CollectFragment};
 
 use web_client::server::attrs::Attrs;
@@ -9,70 +7,11 @@ use web_client::server::popup_menu::{Menu, MenuLink, PopupMenu};
 use crate::components::logo::Logo;
 use crate::routes;
 
-fn profile_links() -> Vec<MenuLink> {
-    let ctx: crate::context::Context =
-        crate::context::context().expect("Unable to retrieve htmx context.");
-
-    match ctx.current_user {
-        Some(user) => {
-            vec![
-                MenuLink::builder()
-                    .label("Your Profile")
-                    .attrs(
-                        Attrs::with("hx-get", routes::user_edit_form(&user.id))
-                            .set("hx-target", modal_target())
-                            .set("hx-push-url", routes::user_edit_form(&user.id)),
-                    )
-                    .build(),
-                MenuLink::builder()
-                    .label("Support")
-                    .attrs(Attrs::with("href", routes::support()))
-                    .build(),
-                MenuLink::builder()
-                    .label("Sign out")
-                    .attrs(Attrs::with("hx-post", routes::logout()))
-                    .build(),
-            ]
-        }
-        None => vec![MenuLink::builder()
-            .label("Sign in")
-            .attrs(Attrs::with("href", routes::login()))
-            .build()],
-    }
-}
-
 #[component]
 pub fn Nav() -> String {
     let ctx: crate::context::Context =
         crate::context::context().expect("Unable to retrieve htmx context.");
-
-    let worksite_id = ctx.worksite_id.clone();
-    let worksite_name = ctx.worksite_name.clone();
-    let current_user = ctx.current_user.clone();
-
-    let nav_links: Vec<(&str, String)> = [
-        ("Wallchart", routes::wallchart(), None),
-        ("Workers", routes::workers(&worksite_id), None),
-        ("Tags", routes::tags(&worksite_id), None),
-        ("Users", routes::users(), Some(UserPermission::CreateUser)),
-        ("Import", routes::csv_upload(), None),
-    ]
-    .into_iter()
-    .filter_map(|(label, href, permission)| match permission {
-        Some(permission) => {
-            current_user.as_ref()?;
-            let current_user = current_user.as_ref().unwrap();
-
-            let has_permission = current_user.has_perm(permission);
-            if has_permission {
-                Some((label, href.clone()))
-            } else {
-                None
-            }
-        }
-        None => Some((label, href)),
-    })
-    .collect();
+    let nav_links: Vec<(&str, String)> = vec![("Home", routes::home())];
 
     html! {
         <nav class="border-b border-gray-200 bg-white">
@@ -115,14 +54,6 @@ pub fn Nav() -> String {
                         </div>
                     </div>
                     <div class="hidden sm:ml-6 sm:flex sm:items-center">
-                        <a
-                            hx-get=routes::selected_worksite_modal()
-                            hx-target=modal_target()
-                            hx-swap="beforeend"
-                            class="cursor-pointer text-indigo-600 hover:text-indigo-900 whitespace-pre-line"
-                        >
-                            {worksite_name.clone()} " ⌄"
-                        </a>
                         <ProfileDropdown />
                     </div>
 
@@ -218,7 +149,7 @@ fn ProfileDropdown() -> String {
         >
             <Menu
                 id="user-nav-menu"
-                links=profile_links().into_iter().collect()
+                links=vec![] // Put profile links here
             />
         </PopupMenu>
     }

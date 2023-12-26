@@ -21,9 +21,5 @@ tokio = { workspace = true, features = ["full"] }
 tower-livereload = { workspace = true }
 web-client = { path = "../web-client" }
 web-macros = { path = "../web-macros" }
-worksite-service = { path = "../worksite/worksite-service" }
-auth-service = { path = "../auth/auth-service" }
-# It is bad that this is here. We should find a way to get the AuthContext type out
-mongo-user-repository = { path = "../auth/adapters/mongo-user-repository" }
 futures = { workspace = true }
 validator = { workspace = true }
