@@ -1,3 +1,4 @@
+use auth::Backend;
 use axum::{
     error_handling::HandleErrorLayer, http::StatusCode, response::IntoResponse, routing::get,
     BoxError, Router,
@@ -8,9 +9,10 @@ use environment::load_environment;
 use std::{net::SocketAddr, sync::Arc};
 use tower::ServiceBuilder;
 
-use tower_sessions::{cookie::time::Duration, mongodb::Client, Expiry, MongoDBStore};
+use tower_sessions::{cookie::time::Duration, mongodb::Client, Expiry, MemoryStore, MongoDBStore};
 use web_htmx::{livereload, routes as web_routes, state::WebHtmxState};
 
+mod auth;
 mod environment;
 
 #[tokio::main]
@@ -28,6 +30,26 @@ async fn main() {
     let app = Router::new()
         .merge(web_routes(web_htmx_state))
         .route("/healthcheck", get(get_health_check));
+
+    // Auth and session setup
+    let session_store = MemoryStore::default();
+    let session_service = ServiceBuilder::new()
+        .layer(HandleErrorLayer::new(|_: BoxError| async {
+            StatusCode::BAD_REQUEST
+        }))
+        .layer(SessionManagerLayer::new(session_store.clone()).with_secure(false));
+
+    let user_memory_store = Backend::default();
+    let session_layer = SessionManagerLayer::new(session_store)
+        .with_secure(false)
+        .with_expiry(Expiry::OnInactivity(Duration::hours(1)));
+    let auth_layer = ServiceBuilder::new()
+        .layer(HandleErrorLayer::new(|_: BoxError| async {
+            StatusCode::BAD_REQUEST
+        }))
+        .layer(AuthManagerLayerBuilder::new(user_memory_store, session_layer).build());
+    let app = app.layer(auth_layer);
+    let app = app.layer(session_service);
 
     #[cfg(debug_assertions)]
     let app = app.layer(livereload::layer());
